@@ -1,12 +1,13 @@
 #!/bin/sh
 # boostrap_kubernetes.sh
 
-# Install latest kubectl
+# Fetch the latest version of kubernetes kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+# Make kubectl executable
 chmod +x ./kubectl
+# Move kubectl into $PATH
 mv ./kubectl /usr/local/bin/kubectl
-
-# Install kubelet and kubeadm
+# Add kubelet and kubeadm to yum repo
 cat <<EOF > /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
@@ -19,10 +20,12 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
 EOF
 # Disabling SELinux by running setenforce 0 is required to allow containers to access the host filesystem, which is required by pod networks for example.
 setenforce 0
+# Install kubelet and kubeadm
 yum install -y kubelet kubeadm
 # Workaround for issue https://github.com/kubernetes/kubernetes/issues/43805 ()
 sed -i 's#Environment="KUBELET_CGROUP_ARGS=-.*#Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"#g' \
     /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+# Start kubelet
 systemctl enable kubelet.service && systemctl start kubelet.service
 # Kubernetes requires that bridge-nf-call-iptables is enabled
 echo 'net.bridge.bridge-nf-call-iptables = 1' >> /etc/sysctl.conf
