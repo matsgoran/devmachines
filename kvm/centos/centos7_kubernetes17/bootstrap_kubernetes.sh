@@ -33,6 +33,9 @@ kubeadm init --pod-network-cidr 10.244.0.0/16 --token-ttl 0
 mkdir -p /home/vagrant/.kube
 cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
 chown -R vagrant:vagrant /home/vagrant/.kube
+# Install Flannel pod network
+sudo -u vagrant kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+sudo -u vagrant kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel-rbac.yml
 # Schedule pods on the master (single node cluster)
 sudo -u vagrant kubectl taint nodes --all node-role.kubernetes.io/master-
 # Deploy Dashboard UI
