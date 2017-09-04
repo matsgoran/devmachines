@@ -1,0 +1,39 @@
+#!/bin/sh
+# boostrap_kubernetes.sh
+
+# Install latest kubectl
+curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
+chmod +x ./kubectl
+mv ./kubectl /usr/local/bin/kubectl
+
+# Install kubelet and kubeadm
+cat <<EOF > /etc/yum.repos.d/kubernetes.repo
+[kubernetes]
+name=Kubernetes
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
+enabled=1
+gpgcheck=1
+repo_gpgcheck=1
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
+        https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
+EOF
+# Disabling SELinux by running setenforce 0 is required to allow containers to access the host filesystem, which is required by pod networks for example.
+setenforce 0
+yum install -y kubelet kubeadm
+# Workaround for issue https://github.com/kubernetes/kubernetes/issues/43805 ()
+sed -i 's#Environment="KUBELET_CGROUP_ARGS=-.*#Environment="KUBELET_CGROUP_ARGS=--cgroup-driver=cgroupfs"#g' \
+    /etc/systemd/system/kubelet.service.d/10-kubeadm.conf
+systemctl enable kubelet.service && systemctl start kubelet.service
+# Kubernetes requires that bridge-nf-call-iptables is enabled
+echo 'net.bridge.bridge-nf-call-iptables = 1' >> /etc/sysctl.conf
+sysctl -p
+# Initialize kuberentes master with kube-router pod network
+kubeadm init --pod-network-cidr 10.244.0.0/16 --token-ttl 0
+# Configure kube for user vagrant
+mkdir -p /home/vagrant/.kube
+cp -i /etc/kubernetes/admin.conf /home/vagrant/.kube/config
+chown -R vagrant:vagrant /home/vagrant/.kube
+# Schedule pods on the master (single node cluster)
+sudo -u vagrant kubectl taint nodes --all node-role.kubernetes.io/master-
+# Deploy Dashboard UI
+sudo -u vagrant kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
