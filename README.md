@@ -15,3 +15,5 @@ utviklepakker i tjeneren.
 
 1. `sudo apt-get install libxslt-dev libxml2-dev libvirt-dev zlib1g-dev ruby-dev`
 2. `vagrant plugin install vagrant-libvirt` 
+3. Hvis du ønsker å bruke 2-veis katalogsynkronisering må NFS brukes. På tjeneren må du dermed installere nfs:
+   `sudo apt-get install nfs-kernel-server nfs-common`
