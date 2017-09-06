@@ -49,4 +49,6 @@ sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/t
 # Deploy traefik using Deployment
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-deployment.yaml
 # Install help
-sudo -u vagrant curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+# Install Tiller in cluster
+sudo -u vagrant helm init
