@@ -48,3 +48,5 @@ sudo -u vagrant kubectl create -f https://rawgit.com/kubernetes/dashboard/master
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-rbac.yaml
 # Deploy traefik using Deployment
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-deployment.yaml
+# Install help
+sudo -u vagrant curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
