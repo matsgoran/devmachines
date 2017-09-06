@@ -43,3 +43,8 @@ sudo -u vagrant kubectl apply -f https://raw.githubusercontent.com/coreos/flanne
 sudo -u vagrant kubectl taint nodes --all node-role.kubernetes.io/master-
 # Deploy Dashboard UI
 sudo -u vagrant kubectl create -f https://rawgit.com/kubernetes/dashboard/master/src/deploy/kubernetes-dashboard.yaml
+# Deploy traefik ingress controller - https://docs.traefik.io/user-guide/kubernetes/
+# RBAC configured cluster - allow traefik to use kubernetes API
+sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-rbac.yaml
+# Deploy traefik using Deployment
+sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-deployment.yaml
