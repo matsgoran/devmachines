@@ -48,7 +48,8 @@ sudo -u vagrant kubectl create -f https://rawgit.com/kubernetes/dashboard/master
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-rbac.yaml
 # Deploy traefik using Deployment
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-deployment.yaml
-# Install help
-curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash
+# Install helm - workaround manipulate paths so install script is happy
+sudo -- bash -c 'export PATH=/usr/local/bin:$PATH && curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash'
 # Install Tiller in cluster
-sudo -u vagrant helm init
+sudo -u vagrant -- bash -c 'export PATH=/usr/local/bin:$PATH && helm init'
+
