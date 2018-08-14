@@ -50,6 +50,21 @@ sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/t
 sudo -u vagrant kubectl create -f https://raw.githubusercontent.com/containous/traefik/master/examples/k8s/traefik-deployment.yaml
 # Install helm - workaround manipulate paths so install script is happy
 sudo -- bash -c 'export PATH=/usr/local/bin:$PATH && curl https://raw.githubusercontent.com/kubernetes/helm/master/scripts/get | bash'
+# Setup service account for tiller in kube cluster (Cluster is running in RBAC mode) ref. https://docs.bitnami.com/kubernetes/how-to/configure-rbac-in-your-kubernetes-cluster/
+sudo -u vagrant kubectl create sa tiller --namespace kube-system
+sudo -u vagrant kubectl create -f - <<EOF
+kind: ClusterRoleBinding
+apiVersion: rbac.authorization.k8s.io/v1beta1
+metadata:
+  name: tiller-clusterrolebinding
+subjects:
+  - kind: ServiceAccount
+    name: tiller
+    namespace: kube-system
+roleRef:
+  kind: ClusterRole
+  name: cluster-admin
+  apiGroup: ""
+EOF
 # Install Tiller in cluster
-sudo -u vagrant -- bash -c 'export PATH=/usr/local/bin:$PATH && helm init'
-
+sudo -u vagrant -- bash -c 'export PATH=/usr/local/bin:$PATH && helm init --service-account tiller --upgrade'
