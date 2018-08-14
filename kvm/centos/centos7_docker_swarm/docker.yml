@@ -1,0 +1,45 @@
+# -*- mode: yaml -*-
+# vi: set ft=yaml :
+
+  - name: upgrade all packages
+    yum:
+      name: '*'
+      state: latest
+
+  - name: install yum-utils
+    yum:
+      name: yum-utils
+      state: latest
+
+  - name: install device-mapper-persistent-data
+    yum:
+      name: device-mapper-persistent-data
+      state: latest
+
+  - name: install lvm2
+    yum:
+      name: lvm2
+      state: latest
+
+  - name: Add docker yum repository
+    command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+      
+  - name: Install docker
+    yum:
+      name: docker-ce
+      state: latest
+
+  - name: enable service docker
+    service:
+      name: docker
+      enabled: yes
+      state: started
+
+  - name: adding existing user vagrant to group docker
+    user:
+      name: vagrant
+      groups: docker
+      append: yes
+    
+      
+  
