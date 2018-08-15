@@ -21,6 +21,11 @@
       name: lvm2
       state: latest
 
+  - name: install netstat
+    yum:
+      name: net-tools
+      state: latest
+      
   - name: Add docker yum repository
     command: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
       
@@ -28,7 +33,7 @@
     yum:
       name: docker-ce
       state: latest
-
+  
   - name: enable service docker
     service:
       name: docker
@@ -40,6 +45,26 @@
       name: vagrant
       groups: docker
       append: yes
-    
+
+  - name: Check if docker daemon file exists
+    stat:
+      path: /etc/docker/daemon.json
+    register: daemon_file
+      
+  - name: Create docker daemon file
+    copy:
+      content: '{"hosts": ["tcp://0.0.0.0:2375", "unix:///var/run/docker.sock"]}'
+      dest: /etc/docker/daemon.json
+    when: daemon_file.stat.exists == false
+
+  - name: Restart service docker, if new docker daemon file
+    service:
+      name: docker
+      state: restarted
+    when: daemon_file.stat.exists == false
+  
+
+  
+      
       
   
