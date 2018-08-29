@@ -1,6 +1,9 @@
 #!/bin/sh
 # boostrap_kubernetes.sh
 
+#Disable swap (No swap under kubernetes)
+swapoff -a
+lvremove -Ay /dev/centos/swap
 # Fetch the latest version of kubernetes kubectl
 curl -LO https://storage.googleapis.com/kubernetes-release/release/$(curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt)/bin/linux/amd64/kubectl
 # Make kubectl executable
